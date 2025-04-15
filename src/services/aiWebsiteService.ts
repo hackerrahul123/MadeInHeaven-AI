@@ -1,4 +1,3 @@
-
 import aiWebsites, { AIWebsite } from "@/data/aiWebsites";
 
 // Use local storage to persist websites between page refreshes
@@ -9,7 +8,7 @@ const LAST_SYNC_KEY = "ai_websites_last_sync";
 // Activity history types
 interface ActivityItem {
   id: string;
-  action: 'add' | 'delete';
+  action: "add" | "delete";
   websiteId: string;
   websiteTitle: string;
   timestamp: number;
@@ -80,7 +79,7 @@ const getLastSyncTime = (): number => {
 const syncWithServer = async (): Promise<boolean> => {
   // In a real app, this would check with the server for updates
   // Here we just simulate a network delay and return success
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     setTimeout(() => {
       resolve(true);
     }, 500);
@@ -92,7 +91,7 @@ const forceSyncData = async (): Promise<boolean> => {
   try {
     // Simulate network request
     const success = await syncWithServer();
-    
+
     if (success) {
       // For demo purposes, we're not actually getting data from a server
       // but we're setting a new timestamp to simulate it
@@ -107,22 +106,24 @@ const forceSyncData = async (): Promise<boolean> => {
 };
 
 // Add an item to activity history
-const addActivityItem = (item: Omit<ActivityItem, "id" | "timestamp" | "canUndo">): void => {
+const addActivityItem = (
+  item: Omit<ActivityItem, "id" | "timestamp" | "canUndo">
+): void => {
   const newItem: ActivityItem = {
     ...item,
     id: Date.now().toString(),
     timestamp: Date.now(),
-    canUndo: true
+    canUndo: true,
   };
-  
+
   // Limit history to most recent 50 items
   activityHistory = [newItem, ...activityHistory].slice(0, 50);
   persistActivityHistory();
 };
 
 // Simple admin authentication (in a real app, this would be more secure)
-const ADMIN_USERNAME = "admin";
-const ADMIN_PASSWORD = "admin123";
+const ADMIN_USERNAME = "RahulRane";
+const ADMIN_PASSWORD = "Uchia@4321";
 
 let isAdminLoggedIn = false;
 
@@ -147,62 +148,65 @@ const getAll = (): AIWebsite[] => {
 };
 
 const getById = (id: string): AIWebsite | undefined => {
-  return websites.find(website => website.id === id);
+  return websites.find((website) => website.id === id);
 };
 
 const getByCategory = (category: string): AIWebsite[] => {
   const categoryMap: Record<string, string> = {
-    'text': 'Text',
-    'image': 'Image',
-    'video': 'Video',
-    'audio': 'Audio',
-    '3d': '3D',
-    'other': 'Other'
+    text: "Text",
+    image: "Image",
+    video: "Video",
+    audio: "Audio",
+    "3d": "3D",
+    other: "Other",
   };
 
   const mappedCategory = categoryMap[category.toLowerCase()] || category;
-  return websites.filter(website => website.category === mappedCategory);
+  return websites.filter((website) => website.category === mappedCategory);
 };
 
 const getFeatured = (): AIWebsite[] => {
-  return websites.filter(website => website.featured);
+  return websites.filter((website) => website.featured);
 };
 
 const getTrending = (): AIWebsite[] => {
-  return websites.filter(website => website.trending);
+  return websites.filter((website) => website.trending);
 };
 
 const search = (query: string): AIWebsite[] => {
   const lowerQuery = query.toLowerCase();
-  return websites.filter(website => 
-    website.title.toLowerCase().includes(lowerQuery) ||
-    website.description.toLowerCase().includes(lowerQuery) ||
-    website.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
+  return websites.filter(
+    (website) =>
+      website.title.toLowerCase().includes(lowerQuery) ||
+      website.description.toLowerCase().includes(lowerQuery) ||
+      website.tags.some((tag) => tag.toLowerCase().includes(lowerQuery))
   );
 };
 
-const add = (website: Omit<AIWebsite, "id" | "dateAdded">): AIWebsite | null => {
+const add = (
+  website: Omit<AIWebsite, "id" | "dateAdded">
+): AIWebsite | null => {
   // Only allow admins to add websites
   if (!isAdminLoggedIn) {
     return null;
   }
-  
+
   const newWebsite: AIWebsite = {
     ...website,
     id: Date.now().toString(),
-    dateAdded: new Date().toISOString().split('T')[0]
+    dateAdded: new Date().toISOString().split("T")[0],
   };
-  
+
   websites = [...websites, newWebsite];
   persistWebsites(); // Save to localStorage
-  
+
   // Add to activity history
   addActivityItem({
-    action: 'add',
+    action: "add",
     websiteId: newWebsite.id,
     websiteTitle: newWebsite.title,
   });
-  
+
   return newWebsite;
 };
 
@@ -211,38 +215,41 @@ const remove = (id: string): boolean => {
   if (!isAdminLoggedIn) {
     return false;
   }
-  
-  const websiteToDelete = websites.find(website => website.id === id);
+
+  const websiteToDelete = websites.find((website) => website.id === id);
   if (!websiteToDelete) return false;
-  
+
   const initialLength = websites.length;
-  websites = websites.filter(website => website.id !== id);
-  
+  websites = websites.filter((website) => website.id !== id);
+
   if (websites.length < initialLength) {
     persistWebsites(); // Save to localStorage
-    
+
     // Add to activity history
     addActivityItem({
-      action: 'delete',
+      action: "delete",
       websiteId: id,
       websiteTitle: websiteToDelete.title,
-      websiteData: websiteToDelete // Store the full website data for potential undo
+      websiteData: websiteToDelete, // Store the full website data for potential undo
     });
-    
+
     return true;
   }
   return false;
 };
 
-const update = (id: string, updatedWebsite: Partial<AIWebsite>): AIWebsite | null => {
+const update = (
+  id: string,
+  updatedWebsite: Partial<AIWebsite>
+): AIWebsite | null => {
   // Only allow admins to update websites
   if (!isAdminLoggedIn) {
     return null;
   }
-  
-  const index = websites.findIndex(website => website.id === id);
+
+  const index = websites.findIndex((website) => website.id === id);
   if (index === -1) return null;
-  
+
   websites[index] = { ...websites[index], ...updatedWebsite };
   persistWebsites(); // Save to localStorage
   return websites[index];
@@ -256,37 +263,39 @@ const getActivityHistory = (): ActivityItem[] => {
 // Undo an action from history
 const undoAction = (activityId: string): boolean => {
   if (!isAdminLoggedIn) return false;
-  
-  const activityIndex = activityHistory.findIndex(item => item.id === activityId);
+
+  const activityIndex = activityHistory.findIndex(
+    (item) => item.id === activityId
+  );
   if (activityIndex === -1) return false;
-  
+
   const activity = activityHistory[activityIndex];
   if (!activity.canUndo) return false;
-  
+
   let success = false;
-  
-  if (activity.action === 'add') {
+
+  if (activity.action === "add") {
     // Undo addition by removing the website
-    success = Boolean(websites.find(w => w.id === activity.websiteId));
+    success = Boolean(websites.find((w) => w.id === activity.websiteId));
     if (success) {
-      websites = websites.filter(w => w.id !== activity.websiteId);
+      websites = websites.filter((w) => w.id !== activity.websiteId);
       persistWebsites();
     }
-  } else if (activity.action === 'delete' && activity.websiteData) {
+  } else if (activity.action === "delete" && activity.websiteData) {
     // Undo deletion by re-adding the website
-    success = !Boolean(websites.find(w => w.id === activity.websiteId));
+    success = !Boolean(websites.find((w) => w.id === activity.websiteId));
     if (success) {
       websites = [...websites, activity.websiteData];
       persistWebsites();
     }
   }
-  
+
   if (success) {
     // Mark the activity as no longer undoable
     activityHistory[activityIndex].canUndo = false;
     persistActivityHistory();
   }
-  
+
   return success;
 };
 
@@ -317,5 +326,5 @@ export default {
   getActivityHistory,
   undoAction,
   forceSyncData,
-  getLastSyncTime
+  getLastSyncTime,
 };

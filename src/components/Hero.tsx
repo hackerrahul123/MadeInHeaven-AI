@@ -1,4 +1,3 @@
-
 import SearchBar from "./SearchBar";
 import { useNavigate } from "react-router-dom";
 
@@ -7,9 +6,9 @@ interface HeroProps {
   subtitle?: string;
 }
 
-const Hero = ({ 
-  title = "Discover the Best AI Tools in One Place", 
-  subtitle = "Search, explore and find the perfect AI tools for your needs" 
+const Hero = ({
+  title = "Discover the Best Free AI Tools & Websites in One Place",
+  subtitle = "Search, explore and find the perfect AI tools for your needs \n MadeInheaven Tech Ai Tools & Websites",
 }: HeroProps) => {
   const navigate = useNavigate();
 
@@ -33,7 +32,10 @@ const Hero = ({
             {subtitle}
           </p>
           <div className="mt-10 max-w-2xl mx-auto">
-            <SearchBar onSearch={handleSearch} className="bg-white p-2 rounded-xl shadow-lg" />
+            <SearchBar
+              onSearch={handleSearch}
+              className="bg-white p-2 rounded-xl shadow-lg"
+            />
           </div>
         </div>
       </div>
